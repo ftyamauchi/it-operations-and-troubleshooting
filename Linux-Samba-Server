@@ -1,0 +1,161 @@
+# Linux Samba Server
+Projeto desenvolvido como laboratório prático para simular o provisionamento de um servidor de arquivos corporativo e a resolução de incidentes comuns de suporte técnico e helpdesk (Troubleshooting).
+
+O projeto demonstra como configurar o compartilhamento de arquivos seguro entre sistemas Linux e estações de trabalho Windows, aplicando controle de acesso baseado em credenciais e mitigando falhas de conectividade de rede.
+
+# Objetivos
+Provisionar um servidor de arquivos Samba em ambiente Linux.
+
+Configurar o compartilhamento de diretórios com permissões de leitura e escrita.
+
+Restringir acessos anônimos para alinhar o ambiente às boas práticas de segurança.
+
+Criar e gerenciar credenciais de usuários para autenticação de rede.
+
+Realizar o troubleshooting de falhas de conectividade, cache e timeout no ecossistema Windows.
+
+# Tecnologias Utilizadas
+Ubuntu Server 24.04 LTS
+
+Oracle VirtualBox
+
+Windows 10 / Windows 11
+
+Samba (SMB/CIFS Protocol)
+
+UFW (Uncomplicated Firewall)
+
+# Estrutura do Projeto
+Linux-Samba-Server/
+│
+├── /samba/
+│   └── publico/           # Diretório compartilhado na rede
+│
+├── /etc/samba/
+│   └── smb.conf           # Arquivo de configuração do serviço
+│
+└── README.md
+# Preparação do Ambiente
+## Sistema Operacional do Servidor
+O ambiente de servidores foi desenvolvido utilizando:
+
+Ubuntu Server 24.04 LTS (Instalado em Máquina Virtual)
+
+Na configuração da placa de rede da máquina virtual no VirtualBox, altere o modo de conexão para:
+
+Placa em modo Bridge
+
+Isso garante que o servidor e o seu computador físico fiquem na mesma rede local, recebendo IPs da mesma faixa.
+
+# Configuração do Firewall
+Dentro do terminal do Ubuntu Server, libere as portas necessárias para o tráfego do protocolo SMB (139 e 445):
+
+Bash
+sudo ufw allow samba
+Verifique o status do firewall para confirmar a liberação:
+
+Bash
+sudo ufw status
+Configuração do Samba
+Crie o diretório que será compartilhado:
+
+Bash
+sudo mkdir -p /samba/publico
+Ajuste as permissões do diretório no sistema de arquivos:
+
+Bash
+sudo chmod -R 0777 /samba/publico
+Abra o arquivo de configuração principal:
+
+Bash
+sudo nano /etc/samba/smb.conf
+Adicione o seguinte bloco de configuração ao final do arquivo para criar o compartilhamento e bloquear acessos anônimos:
+
+Ini, TOML
+[publico]
+   comment = Compartilhamento Publico Homelab
+   path = /samba/publico
+   browseable = yes
+   read only = no
+   guest ok = no
+   valid users = suporte
+   force create mode = 0777
+   force directory mode = 0777
+# Salve e feche o arquivo.
+
+# Criação de Usuário e Credenciais
+Crie a senha de acesso à rede para o usuário que definimos na configuração:
+
+Bash
+sudo smbpasswd -a suporte
+Digite e confirme a senha.
+
+Reinicie o serviço do Samba para aplicar as novas configurações:
+
+Bash
+sudo systemctl restart smbd
+Verifique se o serviço subiu corretamente:
+
+Bash
+sudo systemctl status smbd
+Troubleshooting de Incidentes no Windows
+Durante os testes de acesso a partir da estação Windows, documentou-se a resolução de três problemas comuns enfrentados pelo suporte técnico:
+
+1. Bloqueio de Acesso Guest (Anônimo)
+Sintoma: O Windows rejeitava a conexão de forma imediata ao tentar acessar a pasta de rede.
+
+Causa: Versões modernas do Windows bloqueiam conexões anônimas sem autenticação por padrão devido a políticas de segurança.
+
+Solução: O arquivo smb.conf foi alterado de guest ok = yes para guest ok = no, forçando o Windows a solicitar o login criado.
+
+2. Alteração de IP via DHCP
+Sintoma: O acesso via SSH e o mapeamento de arquivos pararam de responder (Erro: Connection Refused).
+
+Causa: O servidor reiniciou e o roteador alterou o IP dinâmico da máquina virtual.
+
+Solução: Identificação do novo IP através do terminal do Linux:
+
+Bash
+ip a
+O endereço foi atualizado na estação de trabalho para reestabelecer a conexão.
+
+3. Timeout e Conexão Travada ("Trabalhando nisso...")
+Sintoma: O Explorador de Arquivos do Windows travava tentando carregar a pasta infinitamente.
+
+Causa: O Windows armazenou em cache as credenciais e o IP antigo da máquina, gerando um conflito de sessão.
+
+Solução: Abertura do Prompt de Comando (CMD) do Windows físico para limpar as conexões residuais:
+
+DOS
+net use * /delete /y
+Em seguida, o mapeamento foi forçado inserindo o novo IP e as credenciais válidas na linha de comando:
+
+DOS
+net use \\<IP_DO_SERVIDOR>\publico /user:suporte <SENHA_DO_USUARIO>
+Validação do Acesso
+No Windows, abra a janela Executar (Windows + R) e digite o caminho do servidor:
+
+Plaintext
+\\<IP_DO_SERVIDOR>
+A pasta publico abrirá sem travamentos e permitirá a criação de arquivos e subpastas normalmente.
+
+Conceitos Demonstrados
+Este projeto demonstra na prática os seguintes conceitos:
+
+Administração básica de servidores Linux.
+
+Compartilhamento de arquivos em rede híbrida (Linux/Windows).
+
+Configuração de segurança de rede local (Firewall UFW).
+
+Permissões de escrita e leitura de diretórios corporativos.
+
+Gerenciamento de chaves e credenciais locais do Samba (smbpasswd).
+
+Resolução de incidentes técnicos sob sistemas operacionais clientes através do CMD do Windows (net use).
+
+Autores
+Fabio Yamauchi
+
+Licença
+Este projeto foi desenvolvido para fins acadêmicos e laboratoriais de infraestrutura e suporte de TI.
