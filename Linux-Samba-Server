@@ -1,31 +1,31 @@
-# Linux Samba Server
+# Linux-Samba-Server
+
 Projeto desenvolvido como laboratório prático para simular o provisionamento de um servidor de arquivos corporativo e a resolução de incidentes comuns de suporte técnico e helpdesk (Troubleshooting).
 
 O projeto demonstra como configurar o compartilhamento de arquivos seguro entre sistemas Linux e estações de trabalho Windows, aplicando controle de acesso baseado em credenciais e mitigando falhas de conectividade de rede.
 
-# Objetivos
-Provisionar um servidor de arquivos Samba em ambiente Linux.
+## Objetivos
 
-Configurar o compartilhamento de diretórios com permissões de leitura e escrita.
+- Provisionar um servidor de arquivos Samba em ambiente Linux.
+- Configurar o compartilhamento de diretórios com permissões de leitura e escrita.
+- Restringir acessos anônimos para alinhar o ambiente às boas práticas de segurança.
+- Criar e gerenciar credenciais de usuários para autenticação de rede.
+- Realizar o troubleshooting de falhas de conectividade, cache e timeout no ecossistema Windows.
 
-Restringir acessos anônimos para alinhar o ambiente às boas práticas de segurança.
-
-Criar e gerenciar credenciais de usuários para autenticação de rede.
-
-Realizar o troubleshooting de falhas de conectividade, cache e timeout no ecossistema Windows.
+---
 
 # Tecnologias Utilizadas
-Ubuntu Server 24.04 LTS
 
-Oracle VirtualBox
+- Ubuntu Server 24.04 LTS
+- Oracle VirtualBox
+- Windows 10 / Windows 11
+- Samba (SMB/CIFS Protocol)
+- UFW (Uncomplicated Firewall)
 
-Windows 10 / Windows 11
-
-Samba (SMB/CIFS Protocol)
-
-UFW (Uncomplicated Firewall)
+---
 
 # Estrutura do Projeto
+
 Linux-Samba-Server/
 │
 ├── /samba/
@@ -35,22 +35,31 @@ Linux-Samba-Server/
 │   └── smb.conf           # Arquivo de configuração do serviço
 │
 └── README.md
+
+
+---
+
 # Preparação do Ambiente
+
 ## Sistema Operacional do Servidor
+
 O ambiente de servidores foi desenvolvido utilizando:
 
-Ubuntu Server 24.04 LTS (Instalado em Máquina Virtual)
+- Ubuntu Server 24.04 LTS (Instalado em Máquina Virtual)
 
 Na configuração da placa de rede da máquina virtual no VirtualBox, altere o modo de conexão para:
 
-Placa em modo Bridge
+- **Placa em modo Bridge**
 
 Isso garante que o servidor e o seu computador físico fiquem na mesma rede local, recebendo IPs da mesma faixa.
 
+---
+
 # Configuração do Firewall
+
 Dentro do terminal do Ubuntu Server, libere as portas necessárias para o tráfego do protocolo SMB (139 e 445):
 
-Bash
+```bash
 sudo ufw allow samba
 Verifique o status do firewall para confirmar a liberação:
 
@@ -81,9 +90,9 @@ Ini, TOML
    valid users = suporte
    force create mode = 0777
    force directory mode = 0777
-# Salve e feche o arquivo.
+Salve e feche o arquivo.
 
-# Criação de Usuário e Credenciais
+Criação de Usuário e Credenciais
 Crie a senha de acesso à rede para o usuário que definimos na configuração:
 
 Bash
